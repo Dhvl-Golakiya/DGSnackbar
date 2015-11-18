@@ -1,0 +1,6 @@
+framework module DGSnackbar {
+  umbrella header "DGSnackbar-umbrella.h"
+
+  export *
+  module * { export * }
+}

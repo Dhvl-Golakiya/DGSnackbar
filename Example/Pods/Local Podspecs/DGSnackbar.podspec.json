@@ -1,0 +1,25 @@
+{
+  "name": "DGSnackbar",
+  "version": "0.1.0",
+  "summary": "A short description of DGSnackbar.",
+  "description": "",
+  "homepage": "https://github.com/<GITHUB_USERNAME>/DGSnackbar",
+  "license": "MIT",
+  "authors": {
+    "Dhaval Golakiya": "dhaval.golakiya@corp.avinashi.com"
+  },
+  "source": {
+    "git": "https://github.com/<GITHUB_USERNAME>/DGSnackbar.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "requires_arc": true,
+  "source_files": "Pod/Classes/**/*",
+  "resource_bundles": {
+    "DGSnackbar": [
+      "Pod/Assets/*.png"
+    ]
+  }
+}

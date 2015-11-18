@@ -1,0 +1,14 @@
+PODS:
+  - DGSnackbar (0.1.0)
+
+DEPENDENCIES:
+  - DGSnackbar (from `../`)
+
+EXTERNAL SOURCES:
+  DGSnackbar:
+    :path: ../
+
+SPEC CHECKSUMS:
+  DGSnackbar: b69967fbdea99ade356402e93709adaef62eb69b
+
+COCOAPODS: 0.39.0
