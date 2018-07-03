@@ -15,10 +15,10 @@ import UIKit
    public  var messageLabel: UILabel!
     public var textInsets: UIEdgeInsets!
     public var actionButton : UIButton!
-    public var interval = NSTimeInterval()
-    public var dismisTimer = NSTimer()
-    var actionBlock : (DGSnackbar -> Void)?
-    var dismissBlock : (DGSnackbar -> Void)?
+    public var interval = TimeInterval()
+    public var dismisTimer = Timer()
+    var actionBlock : ((DGSnackbar) -> Void)?
+    var dismissBlock : ((DGSnackbar) -> Void)?
     
     let buttonWidth : CGFloat = 44
     
@@ -45,33 +45,33 @@ import UIKit
         
         self.messageLabel = UILabel()
         self.messageLabel.frame = self.bounds
-        self.messageLabel.textColor = UIColor.whiteColor()
-        self.messageLabel.backgroundColor = UIColor.clearColor()
-        self.messageLabel.font = UIFont.systemFontOfSize(14)
+        self.messageLabel.textColor = UIColor.white
+        self.messageLabel.backgroundColor = UIColor.clear
+        self.messageLabel.font = UIFont.systemFont(ofSize: 14)
         self.messageLabel.numberOfLines = 0
-        self.messageLabel.textAlignment = .Center;
+        self.messageLabel.textAlignment = .center;
         self.backgroundView.addSubview(self.messageLabel)
         
         self.actionButton = UIButton()
         self.actionButton.frame = self.bounds
-        self.actionButton.titleLabel?.textColor = UIColor.whiteColor()
-        self.actionButton.backgroundColor = UIColor.clearColor()
-        self.actionButton.titleLabel?.font = UIFont.systemFontOfSize(14)
-        self.actionButton.addTarget(self, action: "onActionButtonPressed:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.actionButton.titleLabel?.textColor = UIColor.white
+        self.actionButton.backgroundColor = UIColor.clear
+        self.actionButton.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+        self.actionButton.addTarget(self, action: #selector(onActionButtonPressed(button:)), for: UIControlEvents.touchUpInside)
         self.backgroundView.addSubview(self.actionButton)
         
         interval = 0
         
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
-            selector: "deviceOrientationDidChange:",
-            name: UIDeviceOrientationDidChangeNotification,
+            selector: #selector(deviceOrientationDidChange(sender:)),
+            name: NSNotification.Name.UIDeviceOrientationDidChange,
             object: nil
         )
         
     }
     
-    func deviceOrientationDidChange(sender: AnyObject?) {
+    @objc func deviceOrientationDidChange(sender: AnyObject?) {
         updateView()
     }
     
@@ -82,8 +82,8 @@ import UIKit
     
     func updateView() {
         
-        let deviceWidth = CGRectGetWidth(UIScreen.mainScreen().bounds)
-        let constraintSize = CGSize(width: deviceWidth * (260.0 / 320.0), height: CGFloat.max)
+        let deviceWidth = UIScreen.main.bounds.width
+        let constraintSize = CGSize(width: deviceWidth * (260.0 / 320.0), height: CGFloat.greatestFiniteMagnitude)
         let textLabelSize = self.messageLabel.sizeThatFits(constraintSize)
         self.messageLabel.frame = CGRect(
             x: 5,
@@ -97,7 +97,7 @@ import UIKit
             width: deviceWidth - 4,
             height: self.messageLabel.frame.size.height + 10 >= 54 ? self.messageLabel.frame.size.height + 10 : 54
         )
-        self.messageLabel.center = CGPointMake(self.messageLabel.center.x, self.backgroundView.center.y)
+        self.messageLabel.center = CGPoint(x: self.messageLabel.center.x, y: self.backgroundView.center.y)
         
         self.actionButton.frame = CGRect(
             x: deviceWidth - 51,
@@ -109,36 +109,36 @@ import UIKit
         
     }
     
-    public func makeSnackbar(message : String?, actionButtonTitle : String?, interval : NSTimeInterval , actionButtonBlock : (DGSnackbar -> Void), dismisBlock : (DGSnackbar -> Void))-> (){
+    public func makeSnackbar(message : String?, actionButtonTitle : String?, interval : TimeInterval , actionButtonBlock : @escaping ((DGSnackbar) -> Void), dismisBlock : @escaping ((DGSnackbar) -> Void))-> (){
         
         self.messageLabel.text = message
-        self.actionButton.setTitle(actionButtonTitle, forState: UIControlState.Normal)
+        self.actionButton.setTitle(actionButtonTitle, for: UIControlState.normal)
         self.interval = interval
         self.actionBlock = actionButtonBlock
         self.dismissBlock = dismisBlock
         show()
     }
     
-   public func makeSnackbar(message : String?, actionButtonImage : UIImage?, interval : NSTimeInterval , actionButtonBlock : (DGSnackbar -> Void), dismisBlock : (DGSnackbar -> Void))-> (){
+    public func makeSnackbar(message : String?, actionButtonImage : UIImage?, interval : TimeInterval , actionButtonBlock : @escaping ((DGSnackbar) -> Void), dismisBlock : @escaping ((DGSnackbar) -> Void))-> (){
         
         
-        let status = NSUserDefaults.standardUserDefaults().boolForKey("DGSnackbar")
+        let status = UserDefaults.standard.bool(forKey: "DGSnackbar")
         
         if status {
             self.dismissSnackBar()
         }
         
         self.messageLabel.text = message
-        self.actionButton.setImage(actionButtonImage, forState: UIControlState.Normal)
+        self.actionButton.setImage(actionButtonImage, for: UIControlState.normal)
         self.interval = interval
         self.actionBlock = actionButtonBlock
         self.dismissBlock = dismisBlock
         show()
     }
     
-    public func makeSnackbar(message : String?, interval : NSTimeInterval, dismisBlock : (DGSnackbar -> Void)) -> () {
+    public func makeSnackbar(message : String?, interval : TimeInterval, dismisBlock : @escaping ((DGSnackbar) -> Void)) -> () {
         self.messageLabel.text = message
-        self.actionButton.setTitle("", forState: UIControlState.Normal)
+        self.actionButton.setTitle("", for: UIControlState.normal)
         self.interval = interval
         self.dismissBlock = dismisBlock
         show()
@@ -146,50 +146,50 @@ import UIKit
     }
     
     func setViewToBottom() {
-        let screenSize = UIScreen.mainScreen().bounds.size
+        let screenSize = UIScreen.main.bounds.size
         self.frame = CGRect(x: 0, y: screenSize.height , width: screenSize.width, height: self.backgroundView.frame.size.height);
     }
     
     func showView() {
-        let screenSize = UIScreen.mainScreen().bounds.size
+        let screenSize = UIScreen.main.bounds.size
         self.frame = CGRect(x: 0, y: screenSize.height - self.backgroundView.frame.size.height - 2, width: screenSize.width, height: self.backgroundView.frame.size.height);
     }
     
     override public var window: UIWindow {
-        for window in UIApplication.sharedApplication().windows ?? [] {
-            if NSStringFromClass(window.dynamicType) == "UITextEffectsWindow" {
+        for window in UIApplication.shared.windows {
+            if NSStringFromClass(type(of: window)) == "UITextEffectsWindow" {
                 return window
             }
         }
-        return UIApplication.sharedApplication().windows.first!
+        return UIApplication.shared.windows.first!
     }
     
     func show() {
         
-        dispatch_async(dispatch_get_main_queue(), {
+        DispatchQueue.main.async {
             self.updateView()
             self.alpha = 0
             self.window.addSubview(self)
-            UIView.animateWithDuration(
-                0.2,
+            UIView.animate(
+                withDuration: 0.2,
                 delay: 0,
-                options: UIViewAnimationOptions.CurveEaseOut,
+                options: UIViewAnimationOptions.curveEaseOut,
                 animations: {
                     self.showView()
                     self.alpha = 1
                 },
                 completion: nil)
-            self.dismisTimer = NSTimer.scheduledTimerWithTimeInterval(self.interval, target: self, selector: "dismissSnackBar", userInfo: nil, repeats: false)
+            self.dismisTimer = Timer.scheduledTimer(timeInterval: self.interval, target: self, selector: #selector(self.dismissSnackBar), userInfo: nil, repeats: false)
             
-        })
+        }
     }
     
-    func dismissSnackBar() {
+    @objc func dismissSnackBar() {
         self.dismisTimer.invalidate()
-        UIView.animateWithDuration(
-            0.0,
+        UIView.animate(
+            withDuration: 0.0,
             delay: 0,
-            options: UIViewAnimationOptions.CurveEaseIn,
+            options: UIViewAnimationOptions.curveEaseIn,
             animations: {
                 self.setViewToBottom()
                 self.alpha = 0
@@ -200,7 +200,7 @@ import UIKit
         })
     }
     
-    func onActionButtonPressed(button : UIButton!) {
+    @objc func onActionButtonPressed(button : UIButton!) {
         self.actionBlock!(self)
         dismissSnackBar()
     }
